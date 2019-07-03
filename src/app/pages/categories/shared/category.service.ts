@@ -1,24 +1,44 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from "@angular/common/http";
 
-import { Observable, throwError } from "rxjs";
-import { map, catchError } from "rxjs/operators";
+import { Observable } from "rxjs";
 import { Category } from './category.model';
+import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CategoryService {
 
-  private apiPath: string = "api/categories";
+  private categoryCollection: AngularFirestoreCollection<Category> = this.afs.collection('Categories');
 
   constructor(
-    private http: HttpClient
+    private afs : AngularFirestore
   ) { }
 
+  getALLCategory(): Observable<Category[]>{
+    return this.categoryCollection.valueChanges();
+  }
+
+  addCategory(c: Category){
+    c.id = this.afs.createId();
+    return this.categoryCollection.doc(c.id).set(c);
+  }
+
+  deleteCategory(c: Category){
+    return this.categoryCollection.doc(c.id).delete();
+  }
+
+  updateCategory(c: Category){
+    return this.categoryCollection.doc(c.id).set(c);
+  }
+
+}
+
+/*
   getAll(): Observable<Category[]>{
-    return this.http.get(this.apiPath)
-      .pipe( 
+    return this.http.get<Category[]>(this.apiPath)
+      .pipe(
+        tap(p=>console.log(p)),
         catchError(this.handleError),
         map(this.jasonDataToCategories)
       )
@@ -75,4 +95,4 @@ export class CategoryService {
     console.log("ERRO NA REQUISIÇÂO => ",  error);
     return throwError(error);    
   }
-}
+  */
