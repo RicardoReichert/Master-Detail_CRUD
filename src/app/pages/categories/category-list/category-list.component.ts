@@ -34,17 +34,22 @@ export class CategoryListComponent implements OnInit {
   }
 
   delete(c: Category){
-    this.categoryService.deleteCategory(c)
-    .then(
-      ()=>{
-        console.log("Product removed.");
-      }
-    )
-    .catch(
-      ()=>{
-        console.error("Error on remove the product.");
-      }
-    )
+    const mustDelete = confirm('Deseja realmente excluir este item?');
+
+    if(mustDelete){
+      this.categoryService.deleteCategory(c)
+      .then(
+        ()=>{
+          console.log("Product removed.");
+        }
+      )
+      .catch(
+        ()=>{
+          console.error("Error on remove the product.");
+        }
+      )
+    }
+    
   }
 
 }
