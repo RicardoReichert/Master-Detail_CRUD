@@ -4,6 +4,7 @@ import { Category } from '../shared/category.model';
 import { CategoryService } from '../shared/category.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { switchMap } from 'rxjs/operators';
+import { throwError, Observable } from 'rxjs';
 
 @Component({
   selector: 'app-category-form',
@@ -16,7 +17,6 @@ export class CategoryFormComponent implements OnInit, AfterContentChecked {
   categoryForm: FormGroup;
   pageTitle: string;
   serverErrorMessages: string[] = null;
-  submittingForm: boolean = false;
   category: Category = new Category();
 
   constructor(
@@ -42,8 +42,10 @@ export class CategoryFormComponent implements OnInit, AfterContentChecked {
     
     if(!c.id)
       this.categoryService.addCategory(c);
-    else
+    else{
       this.categoryService.updateCategory(c);
+      this.router.navigateByUrl("/categories/new");
+    }
     
     this.categoryForm.reset();
   }
@@ -75,12 +77,10 @@ export class CategoryFormComponent implements OnInit, AfterContentChecked {
       .subscribe(
         (category) => {
           this.category = category.data();
-          this.categoryForm.setValue(this.category);
-          console.log(this.category);
-          
+          this.categoryForm.setValue(this.category);          
         },
         (err) => {
-          alert('Erro no Servidor')
+          this.handleError(err);
         }
       )
     }
@@ -93,5 +93,14 @@ export class CategoryFormComponent implements OnInit, AfterContentChecked {
       id: [undefined]
     })
   }
+
+  
+
+    // PRIVATE METHODS
+
+    private handleError(error: any[]): Observable<any>{    
+      console.log("ERRO NA REQUISIÇÂO => ",  error);
+      return throwError(error);    
+    }
 
 }

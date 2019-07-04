@@ -29,9 +29,7 @@ export class CategoryListComponent implements OnInit {
   }
 
   generate(){
-    for(let i=0; i<5; i++){
       this.addOne();
-    }
   }
 
   delete(c: Category){
@@ -54,26 +52,3 @@ export class CategoryListComponent implements OnInit {
   }
 
 }
-
-
-/*
-  categories: Category[];
-
-  constructor(
-    private categoryService: CategoryService
-  ) { }
-
-  ngOnInit() {
-    this.categoryService.getALLCategory()
-    .pipe(
-      tap(p=>console.log("component" + p)),
-      map(cat => this.categories = cat),
-      catchError((e) => {
-        console.log(e);
-        return throwError(e);
-      })
-    )
-    console.log(this.categories);
-    
-  }
-*/
