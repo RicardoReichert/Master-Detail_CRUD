@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 
-import { Observable } from "rxjs";
+import { Observable, from } from "rxjs";
 import { Category } from './category.model';
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
+import { filter } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +18,10 @@ export class CategoryService {
 
   getALLCategory(): Observable<Category[]>{
     return this.categoryCollection.valueChanges();
+  }
+
+  getByIdCategory(id: string){
+    return this.categoryCollection.doc(id).get()
   }
 
   addCategory(c: Category){

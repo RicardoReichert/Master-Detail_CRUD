@@ -3,6 +3,7 @@ import { Category } from '../shared/category.model';
 import { CategoryService } from '../shared/category.service';
 import * as faker from 'faker';
 import { Observable } from 'rxjs';
+import { switchMap, map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-category-list',
@@ -16,7 +17,7 @@ export class CategoryListComponent implements OnInit {
   constructor(private categoryService: CategoryService) { }
 
   ngOnInit() {
-    this.category$ = this.categoryService.getALLCategory();
+    this.category$ = this.categoryService.getALLCategory();    
   }
 
   addOne(){
