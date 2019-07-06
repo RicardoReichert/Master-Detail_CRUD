@@ -59,7 +59,7 @@ export class EntryFormComponent implements OnInit, AfterContentChecked {
     this.buildEntryForm();
     this.loadEntry();
 
-    this.category$ = this.categoryService.getALLCategory();
+    this.category$ = this.categoryService.getAll();
   }
 
   ngAfterContentChecked(): void {
@@ -70,13 +70,13 @@ export class EntryFormComponent implements OnInit, AfterContentChecked {
     let e:Entry = this.entryForm.value;
     
     if(!e.id)
-      this.subscription = this.categoryService.getByIdCategory(e.categoriId)
+      this.subscription = this.categoryService.getById(e.categoriId)
       .subscribe(
         (category) => {
           this.addEntry(e, category.data())
         })
     else{
-      this.subscription = this.categoryService.getByIdCategory(e.categoriId)
+      this.subscription = this.categoryService.getById(e.categoriId)
         .subscribe(
           (category) => {
             this.updateEntry(e, category.data())
@@ -92,14 +92,14 @@ export class EntryFormComponent implements OnInit, AfterContentChecked {
 
   private updateEntry(e: Entry, c: Category){
     e.category = c;  
-    this.entryService.updateEntry(e);
+    this.entryService.update(e);
     this.subscription.unsubscribe();
     this.subscription = null;
   }
 
   private addEntry(e: Entry, c: Category){
     e.category = c;  
-    this.entryService.addEntry(e);
+    this.entryService.add(e);
     this.subscription.unsubscribe();
     this.subscription = null;
   }
@@ -124,11 +124,11 @@ export class EntryFormComponent implements OnInit, AfterContentChecked {
   private loadEntry() {
     if(this.currentAction == "edit"){
       this.route.paramMap.pipe(
-        switchMap(params => this.entryService.getByIdEntry(params.get('id')))
+        switchMap(params => this.entryService.getById(params.get('id')))
       )
       .subscribe(
         (entry) => {
-          this.entry = Object.assign(new Entry(), entry.data());
+          this.entry = Entry.fromData(entry.data());
           console.log(this.entry);          
           this.entryForm.setValue(this.entry);          
         },

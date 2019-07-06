@@ -1,39 +1,14 @@
-import { Injectable } from '@angular/core';
-
-import { Observable } from "rxjs";
-import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
+import { Injectable, Injector } from '@angular/core';
 import { Entry } from './entry.model';
+import { BaseResourceService } from 'src/app/shared/models/base-resource.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class EntryService {
+export class EntryService extends BaseResourceService<Entry> {
 
-  private entryCollection: AngularFirestoreCollection<Entry> = this.afs.collection('Entries');
-
-  constructor(
-    private afs : AngularFirestore
-  ) { }
-
-  getALLEntry(): Observable<Entry[]>{
-    return this.entryCollection.valueChanges();
+  constructor( protected injector: Injector ) {
+    super('Entries', injector);
   }
-
-  getByIdEntry(id: string){
-    return this.entryCollection.doc(id).get()
-  }
-
-  addEntry(e: Entry){
-    e.id = this.afs.createId();
-    return this.entryCollection.doc(e.id).set(e);
-  }
-
-  deleteEntry(e: Entry){
-    return this.entryCollection.doc(e.id).delete();
-  }
-
-  updateEntry(e: Entry){
-    return this.entryCollection.doc(e.id).set(e);
-  }
-
+  
 }

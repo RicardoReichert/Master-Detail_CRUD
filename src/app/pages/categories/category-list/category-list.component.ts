@@ -17,7 +17,7 @@ export class CategoryListComponent implements OnInit {
   constructor(private categoryService: CategoryService) { }
 
   ngOnInit() {
-    this.category$ = this.categoryService.getALLCategory();    
+    this.category$ = this.categoryService.getAll();    
   }
 
   addOne(){
@@ -25,7 +25,7 @@ export class CategoryListComponent implements OnInit {
       name: faker.finance.accountName(),
       description: faker.finance.transactionType()
     };
-    this.categoryService.addCategory(c);
+    this.categoryService.add(c);
   }
 
   generate(){
@@ -36,7 +36,7 @@ export class CategoryListComponent implements OnInit {
     const mustDelete = confirm('Deseja realmente excluir este item?');
 
     if(mustDelete){
-      this.categoryService.deleteCategory(c)
+      this.categoryService.delete(c)
       .then(
         ()=>{
           console.log("Product removed.");

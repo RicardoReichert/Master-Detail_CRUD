@@ -29,13 +29,13 @@ export class EntryListComponent implements OnInit {
    }
 
   ngOnInit() {
-    this.category$ = this.cs.getALLCategory(); 
-    this.entry$ = this.entryService.getALLEntry();
+    this.category$ = this.cs.getAll(); 
+    this.entry$ = this.entryService.getAll();
     this.entry$.subscribe( 
       (entry) => {
         this.entry = [];
         entry.forEach(element => {
-          const ent = Object.assign(new Entry(), element);          
+          const ent = Entry.fromData(element);          
           this.entry.push(ent);
         })      
       }
@@ -56,7 +56,7 @@ export class EntryListComponent implements OnInit {
         categoriId: c.id,
       }
 
-    this.entryService.addEntry(e);
+    this.entryService.add(e);
     this.subscription.unsubscribe();
     this.subscription = null;
   }
@@ -77,7 +77,7 @@ export class EntryListComponent implements OnInit {
       const index = this.entry.indexOf( e );
       this.entry.splice(index, 1);
       
-      this.entryService.deleteEntry(e)
+      this.entryService.delete(e)
       .then(
         ()=>{
           console.log("Product removed.");

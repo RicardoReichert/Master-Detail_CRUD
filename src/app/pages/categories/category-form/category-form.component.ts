@@ -41,9 +41,9 @@ export class CategoryFormComponent implements OnInit, AfterContentChecked {
     let c:Category = this.categoryForm.value;
     
     if(!c.id)
-      this.categoryService.addCategory(c);
+      this.categoryService.add(c);
     else{
-      this.categoryService.updateCategory(c);
+      this.categoryService.update(c);
       this.router.navigateByUrl("/categories/new");
     }
     
@@ -72,7 +72,7 @@ export class CategoryFormComponent implements OnInit, AfterContentChecked {
   private loadCategory() {
     if(this.currentAction == "edit"){
       this.route.paramMap.pipe(
-        switchMap(params => this.categoryService.getByIdCategory(params.get('id')))
+        switchMap(params => this.categoryService.getById(params.get('id')))
       )
       .subscribe(
         (category) => {
