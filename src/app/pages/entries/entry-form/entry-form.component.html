@@ -1,0 +1,108 @@
+
+<nav class="mb-5">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"> <a routerLink="/">Home</a> </li>
+    <li class="breadcrumb-item"> <a routerLink="/entries">Lançamentos</a> </li>
+    <li class="breadcrumb-item active"> {{pageTitle}} </li>
+  </ol>
+</nav>
+
+<div class="row mb-4">
+  <div class="col-md-9">
+    <h1 class="h2 border-left pl-2">{{pageTitle}}</h1>
+  </div>
+  <div class="col-md-3">
+    <a routerLink="/entries" class="btn btn-light float-right"><< Voltar</a>
+  </div>
+</div>
+
+<form [formGroup]="entryForm" (ngSubmit)="onSubmit()">
+
+  <div class="card">
+    <div class="card-header">Informações sobre o Lançamento</div>
+    <div class="card-body">
+      <div class="form-row">
+        
+        <!-- TYPE -->
+        <div class="form-group col-md-2">
+          <label for="type">Tipo</label>
+          <select name="type" id="type" class="form-control" formControlName='type'>
+            <option *ngFor="let op of typesOptions" [value]="op.value"> {{op.text}} </option>
+          </select>
+        </div>
+
+        <!-- NAME -->
+        <div class="form-group col-md-4">
+          <label for="name">Name</label>
+          <input type="text" class="form-control" placeholder="Entry Name"  formControlName='name'>
+        </div>
+
+        <!-- AMOUNT -->
+        <div class="form-group col-md-2">
+          <label for="amount">Valor</label>
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <div class="input-group-text">R$</div>
+            </div>
+            <input [imask]="imaskConfig" type="amount" class="form-control text-right" formControlName='amount'>            
+          </div>          
+        </div>
+
+        <!-- DATA -->
+        <div class="form-group col-md-2">
+          <label for="date">Data</label>
+          <p-calendar
+            id="date"
+            formControlName="date"
+            inputStyleClass="form-control"
+            dataType="string"
+            dateFormat="dd/mm/yy"
+            [locale]="ptBR"
+            [showButtonBar]="true"
+            >
+          </p-calendar>
+        </div>
+
+      </div>
+
+      <div class="form-row">
+        <!-- PAID -->
+        <div class="form-group col-md-2">
+          <label for="paid">Pago</label>
+          <div class="btn-group">
+            <label 
+              (click)="entryForm.get('paid').setValue(true)"
+              [class.active]="entryForm.get('paid').value == true" 
+              class="btn btn-outline-info"
+              >Pago</label>
+            <label 
+              (click)="entryForm.get('paid').setValue(false)"
+              [class.active]="entryForm.get('paid').value == false" 
+              class="btn btn-outline-info"
+              >Pendente</label>
+          </div>
+        </div>    
+
+        <!-- CATEGORY -->
+        <div class="form-group col-md-3">
+          <label for="categoriId">Categoria</label>
+          <select name="categoriId" id="categoriId" class="form-control" formControlName='categoriId'>
+            <option *ngFor="let c of category$ | async" [value]="c.id"> {{c.name}} </option>
+          </select>
+        </div> 
+
+        <!-- DESCRIPTION -->
+        <div class="form-group col-md-7">
+          <label for="description">Description</label>
+          <input type="text" class="form-control" placeholder="Entry Description"  formControlName='description'>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <button [disabled]="!entryForm.valid" type="submit" class="btn btn-primary btn-md float-right mt-3">Salvar</button>
+
+</form>
+
+<pre> {{entryForm.value | json}} </pre>
+
