@@ -1,25 +1,22 @@
-import { Component, OnInit, AfterContentChecked } from '@angular/core';
-import { FormBuilder, Validators, FormGroup } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
-import { switchMap } from 'rxjs/operators';
-import { throwError, Observable, Subscription } from 'rxjs';
+import { Component, OnInit, Injector } from '@angular/core';
+import { Validators } from '@angular/forms';
+import { Observable, Subscription } from 'rxjs';
+
 import { Entry } from '../shared/entry.model';
 import { EntryService } from '../shared/entry.service';
+
 import { Category } from '../../categories/shared/category.model';
 import { CategoryService } from '../../categories/shared/category.service';
+
+import { BaseResourceFormComponent } from 'src/app/shared/components/base-resource-form/base-resource-form.component';
 
 @Component({
   selector: 'app-entry-form',
   templateUrl: './entry-form.component.html',
   styleUrls: ['./entry-form.component.css']
 })
-export class EntryFormComponent implements OnInit, AfterContentChecked {
+export class EntryFormComponent extends BaseResourceFormComponent<Entry> implements OnInit {
   
-  currentAction: string;
-  entryForm: FormGroup;
-  pageTitle: string;
-  serverErrorMessages: string[] = null;
-  entry: Entry = new Entry();
   category$ : Observable<Category[]>;
   subscription: Subscription;
 
@@ -46,28 +43,34 @@ export class EntryFormComponent implements OnInit, AfterContentChecked {
 };
 
   constructor(
-    private categoryService: CategoryService,
-    private entryService: EntryService,
-    private route: ActivatedRoute,
-    private router: Router,
-    private fb: FormBuilder
-  ) { }
-
-  ngOnInit() {
-    
-    this.setCurrentAction();
-    this.buildEntryForm();
-    this.loadEntry();
-
-    this.category$ = this.categoryService.getAll();
+    protected categoryService: CategoryService,
+    protected entryService: EntryService,
+    protected injector: Injector
+  ) { 
+    super(injector, new Entry(), entryService)
   }
 
-  ngAfterContentChecked(): void {
-    this.setPageTitle();
-  }  
+  ngOnInit() {
+    this.category$ = this.categoryService.getAll();
+    super.ngOnInit();
+  }
+  
+  protected buildResourceForm() {
+    this.resourceForm = this.fb.group({
+      name: ["", [Validators.required]],
+      description: ["", [Validators.required]],
+      id: [null],
+      type: ['expense', [Validators.required]],
+      amount: [null, [Validators.required]],
+      date: [null, [Validators.required]],
+      paid: [true, [Validators.required]],
+      category: [null],
+      categoriId: [null, [Validators.required]],
+    })
+  }
 
-  onSubmit(){
-    let e:Entry = this.entryForm.value;
+  protected onSubmit(): void {
+    let e:Entry = this.resourceForm.value;
     
     if(!e.id)
       this.subscription = this.categoryService.getById(e.categoriId)
@@ -81,76 +84,29 @@ export class EntryFormComponent implements OnInit, AfterContentChecked {
           (category) => {
             this.updateEntry(e, category.data())
           })
-
-      this.router.navigateByUrl("/entries/new");
-    }
-    
-    this.entryForm.reset();
+          const baseComponentPath: string = this.route.snapshot.parent.url[0].path;
+          // redirect/reload component page
+          this.router.navigateByUrl(baseComponentPath, {skipLocationChange: true}).then(
+            () => this.router.navigate([baseComponentPath, e.id, "edit"])
+          )
+        }
+    this.resourceForm.reset();
   }
 
   // PRIVATE METHODS
 
-  private updateEntry(e: Entry, c: Category){
+  protected updateEntry(e: Entry, c: Category){
     e.category = c;  
     this.entryService.update(e);
     this.subscription.unsubscribe();
     this.subscription = null;
   }
 
-  private addEntry(e: Entry, c: Category){
+  protected addEntry(e: Entry, c: Category){
     e.category = c;  
     this.entryService.add(e);
     this.subscription.unsubscribe();
     this.subscription = null;
-  }
-
-  setPageTitle() {
-    if(this.currentAction == "new")
-      this.pageTitle = "Cadastro de Novo Lançamento";
-    else{
-      const entryName = this.entry.name || "";
-      this.pageTitle = "Editando Lançamento: " + entryName;
-    }
-  }
-
-  private setCurrentAction() {
-    if(this.route.snapshot.url[0].path == "new"){
-      this.currentAction = "new";
-    }else{
-      this.currentAction = "edit";
-    }
-  }
-
-  private loadEntry() {
-    if(this.currentAction == "edit"){
-      this.route.paramMap.pipe(
-        switchMap(params => this.entryService.getById(params.get('id')))
-      )
-      .subscribe(
-        (entry) => {
-          this.entry = Entry.fromData(entry.data());
-          console.log(this.entry);          
-          this.entryForm.setValue(this.entry);          
-        },
-        (err) => {
-          this.handleError(err);
-        }
-      )
-    }
-  }
-  
-  private buildEntryForm() {
-    this.entryForm = this.fb.group({
-      name: ["", [Validators.required]],
-      description: ["", [Validators.required]],
-      id: [null],
-      type: ['expense', [Validators.required]],
-      amount: [null, [Validators.required]],
-      date: [null, [Validators.required]],
-      paid: [true, [Validators.required]],
-      category: [null],
-      categoriId: [null, [Validators.required]],
-    })
   }
 
   get typesOptions(): Array<any>{
@@ -164,9 +120,13 @@ export class EntryFormComponent implements OnInit, AfterContentChecked {
     )    
   }  
 
-  private handleError(error: any[]): Observable<any>{    
-    console.log("ERRO NA REQUISIÇÂO => ",  error);
-    return throwError(error);    
+  protected createPagetitle(): string{
+    return "Cadastro de Novo Lançamento";
+  }
+
+  protected editionPagetitle(): string{
+    const entryName = this.resource.name || "";
+    return "Editando Lançamento: "+ entryName;
   }
 
 }

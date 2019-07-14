@@ -1,9 +1,7 @@
-<nav class="mb-5">
-  <ol class="breadcrumb">
-    <li class="breadcrumb-item"> <a routerLink="/">Home</a> </li>
-    <li class="breadcrumb-item active"> Lançamentos </li>
-  </ol>
-</nav>
+<app-bread-crumb
+  [items]="[{text: 'Lançamentos'}]"
+  >
+</app-bread-crumb>
 
 <div class="row mb-4">
   <div class="col-md">
@@ -45,7 +43,7 @@
       </td>
       <td class="text-center">
         <a [routerLink]="[e.id, 'edit']" class="btn btn-outline-info btn-sm mr-2">Editar</a>
-        <button (click)="delete(e)" class="btn btn-outline-danger btn-sm ">Excluir</button>
+        <button (click)="deleteResource(e)" class="btn btn-outline-danger btn-sm ">Excluir</button>
       </td>
     </tr>
     

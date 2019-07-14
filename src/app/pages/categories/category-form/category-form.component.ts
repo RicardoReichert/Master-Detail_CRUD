@@ -1,106 +1,56 @@
-import { Component, OnInit, AfterContentChecked } from '@angular/core';
-import { FormBuilder, Validators, FormGroup } from '@angular/forms';
+import { Component, Injector} from '@angular/core';
+import { Validators } from '@angular/forms';
+
 import { Category } from '../shared/category.model';
 import { CategoryService } from '../shared/category.service';
-import { ActivatedRoute, Router } from '@angular/router';
-import { switchMap } from 'rxjs/operators';
-import { throwError, Observable } from 'rxjs';
+
+import { BaseResourceFormComponent } from 'src/app/shared/components/base-resource-form/base-resource-form.component';
 
 @Component({
   selector: 'app-category-form',
   templateUrl: './category-form.component.html',
   styleUrls: ['./category-form.component.css']
 })
-export class CategoryFormComponent implements OnInit, AfterContentChecked {
-  
-  currentAction: string;
-  categoryForm: FormGroup;
-  pageTitle: string;
-  serverErrorMessages: string[] = null;
-  category: Category = new Category();
 
-  constructor(
-    private categoryService: CategoryService,
-    private route: ActivatedRoute,
-    private router: Router,
-    private fb: FormBuilder
-  ) { }
+export class CategoryFormComponent extends BaseResourceFormComponent<Category> {
 
-  ngOnInit() {
-    
-    this.setCurrentAction();
-    this.buildCategoryForm();
-    this.loadCategory();
+  constructor( protected categoryService: CategoryService, protected intector: Injector ) { 
+    super(intector, new Category, categoryService);
   }
 
-  ngAfterContentChecked(): void {
-    this.setPageTitle();
-  }  
-
-  onSubmit(){
-    let c:Category = this.categoryForm.value;
-    
-    if(!c.id)
-      this.categoryService.add(c);
-    else{
-      this.categoryService.update(c);
-      this.router.navigateByUrl("/categories/new");
-    }
-    
-    this.categoryForm.reset();
-  }
-
-  // PRIVATE METHODS
-
-  setPageTitle() {
-    if(this.currentAction == "new")
-      this.pageTitle = "Cadastro de Nova Categoria";
-    else{
-      const categoryName = this.category.name || "";
-      this.pageTitle = "Editando Categoria: " + categoryName;
-    }
-  }
-
-  private setCurrentAction() {
-    if(this.route.snapshot.url[0].path == "new"){
-      this.currentAction = "new";
-    }else{
-      this.currentAction = "edit";
-    }
-  }
-
-  private loadCategory() {
-    if(this.currentAction == "edit"){
-      this.route.paramMap.pipe(
-        switchMap(params => this.categoryService.getById(params.get('id')))
-      )
-      .subscribe(
-        (category) => {
-          this.category = category.data();
-          this.categoryForm.setValue(this.category);          
-        },
-        (err) => {
-          this.handleError(err);
-        }
-      )
-    }
-  }
-  
-  private buildCategoryForm() {
-    this.categoryForm = this.fb.group({
+  protected buildResourceForm(): void {
+    this.resourceForm = this.fb.group({
       name: ["", [Validators.required]],
       description: ["", [Validators.required]],
       id: [undefined]
     })
   }
 
-  
+  protected onSubmit(): void {
+    let c:Category = this.resourceForm.value;
+    
+    if(!c.id)
+      this.resourceService.add(c);
+    else{
+      this.resourceService.update(c);
+      const baseComponentPath: string = this.route.snapshot.parent.url[0].path;
 
-    // PRIVATE METHODS
-
-    private handleError(error: any[]): Observable<any>{    
-      console.log("ERRO NA REQUISIÇÂO => ",  error);
-      return throwError(error);    
+      // redirect/reload component page
+      this.router.navigateByUrl(baseComponentPath, {skipLocationChange: true}).then(
+        () => this.router.navigate([baseComponentPath, c.id, "edit"])
+      )
     }
+    
+    this.resourceForm.reset();
+  }
+
+  protected createPagetitle(): string{
+    return "Cadastro de Nova Categoria";
+  }
+
+  protected editionPagetitle(): string{
+    const categoryName = this.resource.name || "";
+    return "Editando Categoria: "+ categoryName;
+  }
 
 }

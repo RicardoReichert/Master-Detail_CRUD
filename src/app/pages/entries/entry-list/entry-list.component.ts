@@ -1,45 +1,50 @@
 import { Component, OnInit } from '@angular/core';
 import * as faker from 'faker';
 import { Observable, Subscription } from 'rxjs';
+
 import { Entry } from '../shared/entry.model';
 import { EntryService } from '../shared/entry.service';
+
 import { CategoryService } from '../../categories/shared/category.service';
-import { switchMap, map, delay } from 'rxjs/operators';
 import { Category } from '../../categories/shared/category.model';
+import { BaseResourceListComponent } from 'src/app/shared/components/base-resource-list/base-resource-list.component';
 
 @Component({
   selector: 'app-entry-list',
   templateUrl: './entry-list.component.html',
   styleUrls: ['./entry-list.component.css']
 })
-export class EntryListComponent implements OnInit {
 
-  entry$: Observable<Entry[]>;
+export class EntryListComponent extends BaseResourceListComponent<Entry> implements OnInit {
+
   entry: Entry[] = [];
+
   category$: Observable<Category[]>;
   category: Category = null;
+
   subscription: Subscription;
-  pago: boolean[];
-  cat: string[];
-  
+
+  pago: boolean[] = [true, false];
+  cat: string[] = ['expense', 'revenue'];
 
   constructor(private entryService: EntryService, private cs: CategoryService) {
-      this.pago = [true, false];
-      this.cat = ['expense', 'revenue'];
+      super(entryService);
+      
    }
 
   ngOnInit() {
-    this.category$ = this.cs.getAll(); 
-    this.entry$ = this.entryService.getAll();
-    this.entry$.subscribe( 
-      (entry) => {
+    this.category$ = this.cs.getAll();    
+    super.ngOnInit();
+    
+    this.resources$.subscribe( 
+      (res) => {
         this.entry = [];
-        entry.forEach(element => {
+        res.forEach(element => {
           const ent = Entry.fromData(element);          
           this.entry.push(ent);
         })      
       }
-    )         
+    )
   }
 
   addOne(c: Category){
@@ -70,25 +75,13 @@ export class EntryListComponent implements OnInit {
         (error) => { "Error: " + error});
   }
 
-  delete(e: Entry){
-    const mustDelete = confirm('Deseja realmente excluir este item?');
+  deleteResource(e: Entry){
 
-    if(mustDelete){
+    if(super.deleteResource(e)){
       const index = this.entry.indexOf( e );
       this.entry.splice(index, 1);
-      
-      this.entryService.delete(e)
-      .then(
-        ()=>{
-          console.log("Product removed.");
-        }
-      )
-      .catch(
-        ()=>{
-          console.error("Error on remove the product.");
-        }
-      )
-    }
+      return true
+    }    
     
   }
 

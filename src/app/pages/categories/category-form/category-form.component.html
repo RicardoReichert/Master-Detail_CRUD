@@ -1,11 +1,7 @@
-
-<nav class="mb-5">
-  <ol class="breadcrumb">
-    <li class="breadcrumb-item"> <a routerLink="/">Home</a> </li>
-    <li class="breadcrumb-item"> <a routerLink="/categories">Categorias</a> </li>
-    <li class="breadcrumb-item active"> {{pageTitle}} </li>
-  </ol>
-</nav>
+<app-bread-crumb
+  [items]="[{text: 'Categorias', link: '/categories'}, {text: pageTitle}]"
+  >
+</app-bread-crumb>
 
 <div class="row mb-4">
   <div class="col-md">
@@ -16,7 +12,7 @@
   </div>
 </div>
 
-<form [formGroup]="categoryForm" (ngSubmit)="onSubmit()">
+<form [formGroup]="resourceForm" (ngSubmit)="onSubmit()">
 
   <div class="card">
     <div class="card-header">Informações sobre a Categoria</div>
@@ -36,7 +32,7 @@
       </div>
     </div>
   </div>
-  <button [disabled]="!categoryForm.valid" type="submit" class="btn btn-primary btn-md float-right mt-3">Salvar</button>
+  <button [disabled]="!resourceForm.valid" type="submit" class="btn btn-primary btn-md float-right mt-3">Salvar</button>
 
 </form>
 

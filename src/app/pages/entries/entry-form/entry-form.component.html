@@ -1,11 +1,7 @@
-
-<nav class="mb-5">
-  <ol class="breadcrumb">
-    <li class="breadcrumb-item"> <a routerLink="/">Home</a> </li>
-    <li class="breadcrumb-item"> <a routerLink="/entries">Lançamentos</a> </li>
-    <li class="breadcrumb-item active"> {{pageTitle}} </li>
-  </ol>
-</nav>
+<app-bread-crumb
+  [items]="[{text: 'Lançamentos', link: '/entries'}, {text: pageTitle}]"
+  >
+</app-bread-crumb>
 
 <div class="row mb-4">
   <div class="col-md-9">
@@ -16,7 +12,7 @@
   </div>
 </div>
 
-<form [formGroup]="entryForm" (ngSubmit)="onSubmit()">
+<form [formGroup]="resourceForm" (ngSubmit)="onSubmit()">
 
   <div class="card">
     <div class="card-header">Informações sobre o Lançamento</div>
@@ -71,13 +67,13 @@
           <label for="paid">Pago</label>
           <div class="btn-group">
             <label 
-              (click)="entryForm.get('paid').setValue(true)"
-              [class.active]="entryForm.get('paid').value == true" 
+              (click)="resourceForm.get('paid').setValue(true)"
+              [class.active]="resourceForm.get('paid').value == true" 
               class="btn btn-outline-info"
               >Pago</label>
             <label 
-              (click)="entryForm.get('paid').setValue(false)"
-              [class.active]="entryForm.get('paid').value == false" 
+              (click)="resourceForm.get('paid').setValue(false)"
+              [class.active]="resourceForm.get('paid').value == false" 
               class="btn btn-outline-info"
               >Pendente</label>
           </div>
@@ -100,9 +96,9 @@
       </div>
     </div>
   </div>
-  <button [disabled]="!entryForm.valid" type="submit" class="btn btn-primary btn-md float-right mt-3">Salvar</button>
+  <button [disabled]="!resourceForm.valid" type="submit" class="btn btn-primary btn-md float-right mt-3">Salvar</button>
 
 </form>
 
-<pre> {{entryForm.value | json}} </pre>
+<pre> {{resourceForm.value | json}} </pre>
 
