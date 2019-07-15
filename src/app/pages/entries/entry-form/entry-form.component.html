@@ -3,14 +3,12 @@
   >
 </app-bread-crumb>
 
-<div class="row mb-4">
-  <div class="col-md-9">
-    <h1 class="h2 border-left pl-2">{{pageTitle}}</h1>
-  </div>
-  <div class="col-md-3">
-    <a routerLink="/entries" class="btn btn-light float-right"><< Voltar</a>
-  </div>
-</div>
+<app-page-header
+  [page-title]="pageTitle"
+  button-text="<< Voltar"
+  button-link="/entries"
+  button-class="btn-light"
+></app-page-header>
 
 <form [formGroup]="resourceForm" (ngSubmit)="onSubmit()">
 
@@ -25,12 +23,14 @@
           <select name="type" id="type" class="form-control" formControlName='type'>
             <option *ngFor="let op of typesOptions" [value]="op.value"> {{op.text}} </option>
           </select>
+          <app-form-field-error [form-control]="resourceForm.get('type')"></app-form-field-error>
         </div>
 
         <!-- NAME -->
         <div class="form-group col-md-4">
           <label for="name">Name</label>
           <input type="text" class="form-control" placeholder="Entry Name"  formControlName='name'>
+          <app-form-field-error [form-control]="resourceForm.get('name')"></app-form-field-error>
         </div>
 
         <!-- AMOUNT -->
@@ -41,7 +41,8 @@
               <div class="input-group-text">R$</div>
             </div>
             <input [imask]="imaskConfig" type="amount" class="form-control text-right" formControlName='amount'>            
-          </div>          
+          </div>   
+          <app-form-field-error [form-control]="resourceForm.get('amount')"></app-form-field-error>       
         </div>
 
         <!-- DATA -->
@@ -57,6 +58,7 @@
             [showButtonBar]="true"
             >
           </p-calendar>
+          <app-form-field-error [form-control]="resourceForm.get('date')"></app-form-field-error>
         </div>
 
       </div>
@@ -77,6 +79,7 @@
               class="btn btn-outline-info"
               >Pendente</label>
           </div>
+          <app-form-field-error [form-control]="resourceForm.get('paid')"></app-form-field-error>
         </div>    
 
         <!-- CATEGORY -->
@@ -85,6 +88,7 @@
           <select name="categoriId" id="categoriId" class="form-control" formControlName='categoriId'>
             <option *ngFor="let c of category$ | async" [value]="c.id"> {{c.name}} </option>
           </select>
+          <app-form-field-error [form-control]="resourceForm.get('categoriId')"></app-form-field-error>
         </div> 
 
         <!-- DESCRIPTION -->
@@ -99,6 +103,4 @@
   <button [disabled]="!resourceForm.valid" type="submit" class="btn btn-primary btn-md float-right mt-3">Salvar</button>
 
 </form>
-
-<pre> {{resourceForm.value | json}} </pre>
 

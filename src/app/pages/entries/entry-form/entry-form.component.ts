@@ -57,7 +57,7 @@ export class EntryFormComponent extends BaseResourceFormComponent<Entry> impleme
   
   protected buildResourceForm() {
     this.resourceForm = this.fb.group({
-      name: ["", [Validators.required]],
+      name: ["", [Validators.required, Validators.minLength(6)]],
       description: ["", [Validators.required]],
       id: [null],
       type: ['expense', [Validators.required]],
